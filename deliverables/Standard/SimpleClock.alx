@@ -1,0 +1,31 @@
+<loader version="1.0">
+	<application id="SimpleClock">
+		<name >
+			SimpleClock
+		</name>
+		<description >
+			Clock with Seconds Display and Audio Beep on the Minute
+		</description>
+		<version >
+			0.02
+		</version>
+		<vendor >
+			TAN Hock Woo
+		</vendor>
+		<copyright >
+			Copyright (c) 2011 TAN Hock Woo
+		</copyright>
+		<fileset Java="1.54" _blackberryVersion="[6.0.0)">
+			<directory >
+				6.0.0
+			</directory>
+			<files >
+				SimpleClock.cod
+
+			</files>
+
+		</fileset>
+
+	</application>
+
+</loader>
