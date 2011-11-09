@@ -1,0 +1,11 @@
+MIDlet-Name: TimeWatch
+MIDlet-Version: 2011.11.09.0
+MIDlet-Vendor: Tan Hock Woo
+MIDlet-Description: Clock with Second Hand and Minute Chime
+MIDlet-Jar-URL: TimeWatch.jar
+MIDlet-Jar-Size: 0
+MicroEdition-Profile: MIDP-2.0
+MicroEdition-Configuration: CLDC-1.1
+MIDlet-1: TimeWatch,img/icon.png,
+RIM-MIDlet-Flags-1: 0
+

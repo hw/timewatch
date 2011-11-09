@@ -1,4 +1,4 @@
-package sg.hw.bb.simpleclock;
+package sg.hw.bb.timewatch;
 
 import java.util.Calendar;
 
@@ -13,30 +13,31 @@ import net.rim.device.api.ui.container.MainScreen;
  * A class extending the MainScreen class, which provides default standard
  * behavior for BlackBerry GUI applications.
  */
-public final class SimpleClockScreen extends MainScreen
+public final class TimeWatchScreen extends MainScreen
 {
 	final double HOUR_MARKER_LEN = 0.1;
 	final double MINUTE_MARKER_LEN = 0.05;
 	final double DIGIT_OFFSET = 0.2;
+	final double HANDS_WIDTH  = 3.0;
 	
 	int		markerColor	  = Color.GOLD;
 	int[]   handsColor    = new int[] { Color.SILVER, Color.ANTIQUEWHITE, Color.ANTIQUEWHITE };
-	int[]   handsTipColor = new int[] { Color.WHITE, Color.RED, Color.RED };
-	float[] handsLength   = new float[] { 0.6f, 0.8f, 1.0f }; 
+	int[]   handsTipColor = new int[] { Color.ROYALBLUE, Color.RED, Color.RED };
+	float[] handsLength   = new float[] { 0.75f, 0.6f, 0.95f };
+
 	
-	private Bitmap cacheBitmap = null;
-	private int   cachedWidth = 0;
-	private int   cachedHeight = 0;
-	private float marker = -1;
+	private Bitmap	cacheBitmap = null;
+	private int		cachedWidth = 0;
+	private int		cachedHeight = 0;
+	private double	marker = -1;
 	
     /**
      * Creates a new TimeSignalFrame object
      */
-    public SimpleClockScreen()
+    public TimeWatchScreen()
     {        
     	// Set the displayed title of the screen       
-        setTitle("Simple Clock");
- //       addMenuItem(toggleMinuteSignalMenuItem);
+        setTitle("TimeWatch");
     }
     
     protected void paint(Graphics graphics)
@@ -44,7 +45,7 @@ public final class SimpleClockScreen extends MainScreen
     	int 	width = Display.getWidth();
     	int 	height = Display.getHeight();
     	int 	midX = width/2;
-    	int 	midY = (height-20)/2;
+    	int 	midY = height/2;
     	int 	radius = (midX < midY) ? midX-1 : midY-1 ;
     	Bitmap bitmap;
     	
@@ -129,8 +130,8 @@ public final class SimpleClockScreen extends MainScreen
     		int x2 = (int)(midX + 0.8*handsLength[n]*radius*sAngle);
     		int y2 = (int)(midY - 0.8*handsLength[n]*radius*cAngle);
     		
-    		int dX = (int)(2.0*cAngle);
-    		int dY = (int)(2.0*sAngle);
+    		int dX = (int)(HANDS_WIDTH*cAngle);
+    		int dY = (int)(HANDS_WIDTH*sAngle);
     	
     		g.setColor(handsColor[n]);
     		g.drawLine(midX, midY, x2, y2);
@@ -157,8 +158,8 @@ public final class SimpleClockScreen extends MainScreen
     		int y1 = (int)(midY - radius*cAngle);
     		int x2 = (int)(midX + (1-HOUR_MARKER_LEN)*radius*sAngle);
     		int y2 = (int)(midY - (1-HOUR_MARKER_LEN)*radius*cAngle);
-    		int dX = (int)(2.0*cAngle);
-    		int dY = (int)(2.0*sAngle);    		
+    		int dX = (int)(HANDS_WIDTH*cAngle);
+    		int dY = (int)(HANDS_WIDTH*sAngle);    		
     		g.setColor(markerColor);
     		g.drawLine(x2-dX, y2+dY, x1-dX, y1+dY);
     		g.drawLine(x2+dX, y2-dY, x1+dX, y1-dY);
@@ -168,15 +169,15 @@ public final class SimpleClockScreen extends MainScreen
     	g.fillEllipse(midX, midY, midX+4, midY, midX, midY+4, 0, 360);
     	
     	super.paint(graphics);    	
-    	graphics.drawBitmap(0, 25, bitmap.getWidth(), bitmap.getHeight()-25, bitmap, 0, 0);
+    	graphics.drawBitmap(0, 0, bitmap.getWidth(), bitmap.getHeight(), bitmap, 0, 0);
     }
    
     public void markTime()
     {
     	Calendar cal = Calendar.getInstance();  
-    	float second = (float)cal.get(Calendar.SECOND);
-    	float milsec = (float)cal.get(Calendar.MILLISECOND);    	
-    	marker = (int)(second*12 + milsec/1000.f*12);
+    	double second = (double)cal.get(Calendar.SECOND);
+    	double milsec = (double)cal.get(Calendar.MILLISECOND);    	
+    	marker = (int)(second*12 + milsec/1000*12);
     	refreshScreen();
     }
     

@@ -1,4 +1,4 @@
-package sg.hw.bb.simpleclock;
+package sg.hw.bb.timewatch;
 
 import java.util.Hashtable;
 import java.util.Timer;
@@ -21,12 +21,12 @@ import net.rim.device.api.ui.component.Dialog;
  * This class extends the UiApplication class, providing a
  * graphical user interface.
  */
-public class SimpleClockApp extends UiApplication implements RealtimeClockListener
+public class TimeWatchApp extends UiApplication implements RealtimeClockListener
 {
 	class TimeSignalTask extends TimerTask
 	{
-		SimpleClockApp app;
-		public TimeSignalTask(SimpleClockApp app)
+		TimeWatchApp app;
+		public TimeSignalTask(TimeWatchApp app)
 		{
 			super();
 			this.app = app;
@@ -38,14 +38,14 @@ public class SimpleClockApp extends UiApplication implements RealtimeClockListen
 		}
 	};
 	
-	private final static boolean 	DEBUG_MODE = true;	
-	private final static long 		PERSISTENT_STORE_KEY = 0x8656bdebbc4bfe7L;
-	private final static short[]	CHIME = new short[] { 2500, 250, 0, 50 };
+	private final static boolean 	DEBUG_MODE = false;	
+	private final static long 		PERSISTENT_STORE_KEY = 0x667a7384ab9ab9f1L;
+	private final static short[]	CHIME = new short[] { 1200, 100, 1700, 100, 0, 50 };
 	private final static String 	CHIME_HASHTABLE_KEY = "IsChimeEnabled";
 	private final static String[]	CHIME_MENU_TEXT = new String[] { "Enable Chime", "Disable Chime" };
 
 	
-	private SimpleClockScreen mainScreen;
+	private TimeWatchScreen mainScreen;
 	private Timer refreshTimer;
 	private Boolean isChimeEnabled;
 	
@@ -75,7 +75,7 @@ public class SimpleClockApp extends UiApplication implements RealtimeClockListen
 	{
 		public void run()
 		{
-			Dialog dlg = new Dialog(Dialog.D_OK, "SimpleClock \u00a9 2011\n  Tan Hock Woo", 0, Bitmap.getBitmapResource("icon.png"), Screen.NO_SYSTEM_MENU_ITEMS);
+			Dialog dlg = new Dialog(Dialog.D_OK, "Time Watch \u00a9 2011\n  Tan Hock Woo", 0, Bitmap.getBitmapResource("icon.png"), Screen.NO_SYSTEM_MENU_ITEMS);
 			dlg.doModal();
 		}
 	};
@@ -88,21 +88,21 @@ public class SimpleClockApp extends UiApplication implements RealtimeClockListen
     {
         // Create a new instance of the application and make the currently
         // running thread the application's event dispatch thread.
-        SimpleClockApp theApp = new SimpleClockApp();       
+        TimeWatchApp theApp = new TimeWatchApp();       
         theApp.enterEventDispatcher();
     }
         
     /**
      * Creates a new TimeSignalApp object
      */
-    public SimpleClockApp()
+    public TimeWatchApp()
     {        
     	// Load settings and setup menus
     	loadSettings();
     	toggleMinuteBeepMenuItem.setText(CHIME_MENU_TEXT[isChimeEnabled.booleanValue() ? 1 : 0]);    	
     	
     	// Push a screen onto the UI stack for rendering.
-    	mainScreen = new SimpleClockScreen();
+    	mainScreen = new TimeWatchScreen();
     	mainScreen.addMenuItem(markMenuItem);
     	mainScreen.addMenuItem(toggleMinuteBeepMenuItem);
     	mainScreen.addMenuItem(MenuItem.separator(1010));
@@ -120,11 +120,8 @@ public class SimpleClockApp extends UiApplication implements RealtimeClockListen
     	{
 	    	PersistentObject persistentObject = PersistentStore.getPersistentObject(PERSISTENT_STORE_KEY);
 	    	Hashtable settings = (Hashtable)persistentObject.getContents();
-	    	if (settings == null) return;
-	    	{
-	    		settings = new Hashtable();
-	    		settings.put(CHIME_HASHTABLE_KEY, isChimeEnabled);
-	    	};
+	    	if (settings == null || !settings.containsKey(CHIME_HASHTABLE_KEY)) return; 
+	    	isChimeEnabled = (Boolean)settings.get(CHIME_HASHTABLE_KEY);
     	}
     }
     

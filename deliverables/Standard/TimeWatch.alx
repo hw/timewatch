@@ -1,13 +1,13 @@
 <loader version="1.0">
-	<application id="SimpleClock">
+	<application id="TimeWatch">
 		<name >
-			SimpleClock
+			TimeWatch
 		</name>
 		<description >
 			Clock with Second Hand and Minute Chime
 		</description>
 		<version >
-			0.10
+			2011.11.09.0
 		</version>
 		<vendor >
 			Tan Hock Woo
@@ -20,7 +20,7 @@
 				6.0.0
 			</directory>
 			<files >
-				SimpleClock.cod
+				TimeWatch.cod
 
 			</files>
 
