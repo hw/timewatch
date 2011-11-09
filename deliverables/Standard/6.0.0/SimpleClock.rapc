@@ -1,7 +1,7 @@
 MIDlet-Name: SimpleClock
-MIDlet-Version: 0.02
-MIDlet-Vendor: TAN Hock Woo
-MIDlet-Description: Clock with Seconds Display and Audio Beep on the Minute
+MIDlet-Version: 0.10
+MIDlet-Vendor: Tan Hock Woo
+MIDlet-Description: Clock with Second Hand and Minute Chime
 MIDlet-Jar-URL: SimpleClock.jar
 MIDlet-Jar-Size: 0
 MicroEdition-Profile: MIDP-2.0

@@ -1,17 +1,17 @@
 Manifest-Version: 1.0
 RIM-COD-Module-Name: SimpleClock
 RIM-COD-Module-Dependencies: net_rim_cldc
-MIDlet-Jar-Size: 23468
+MIDlet-Jar-Size: 24954
 MIDlet-1: SimpleClock,img/icon.png,
-RIM-COD-Creation-Time: 1320779594
+RIM-COD-Creation-Time: 1320837787
 MIDlet-Jar-URL: SimpleClock.jar
 RIM-COD-URL: SimpleClock.cod
-RIM-COD-SHA1: 7f 2a 15 8e ab 4e d4 cb db 82 5e ba 2f 9e f6 89 f2 10 1b 3f
-RIM-COD-Size: 12396
+RIM-COD-SHA1: 75 b4 11 41 db 0e 18 b6 52 d0 f7 14 ab 8e 47 f9 0c 9e 7a c3
+RIM-COD-Size: 13008
 MicroEdition-Configuration: CLDC-1.1
-MIDlet-Version: 0.02
+MIDlet-Version: 0.10
 MIDlet-Name: SimpleClock
-MIDlet-Description: Clock with Seconds Display and Audio Beep on the Minute
-MIDlet-Vendor: TAN Hock Woo
+MIDlet-Description: Clock with Second Hand and Minute Chime
+MIDlet-Vendor: Tan Hock Woo
 MicroEdition-Profile: MIDP-2.0
 RIM-MIDlet-Flags-1: 0

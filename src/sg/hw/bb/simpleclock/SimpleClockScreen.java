@@ -2,7 +2,6 @@ package sg.hw.bb.simpleclock;
 
 import java.util.Calendar;
 
-import net.rim.device.api.i18n.DateFormat;
 import net.rim.device.api.i18n.SimpleDateFormat;
 import net.rim.device.api.system.Bitmap;
 import net.rim.device.api.system.Display;
@@ -20,13 +19,15 @@ public final class SimpleClockScreen extends MainScreen
 	final double MINUTE_MARKER_LEN = 0.05;
 	final double DIGIT_OFFSET = 0.2;
 	
-	int[]   handsColor    = new int[] { Color.AZURE, Color.ANTIQUEWHITE, Color.AZURE };
-	int[]   handsTipColor = new int[] { Color.RED, Color.AZURE, Color.RED };
+	int		markerColor	  = Color.GOLD;
+	int[]   handsColor    = new int[] { Color.SILVER, Color.ANTIQUEWHITE, Color.ANTIQUEWHITE };
+	int[]   handsTipColor = new int[] { Color.WHITE, Color.RED, Color.RED };
 	float[] handsLength   = new float[] { 0.6f, 0.8f, 1.0f }; 
 	
 	private Bitmap cacheBitmap = null;
-	private int cachedWidth = 0;
-	private int cachedHeight = 0;
+	private int   cachedWidth = 0;
+	private int   cachedHeight = 0;
+	private float marker = -1;
 	
     /**
      * Creates a new TimeSignalFrame object
@@ -43,7 +44,7 @@ public final class SimpleClockScreen extends MainScreen
     	int 	width = Display.getWidth();
     	int 	height = Display.getHeight();
     	int 	midX = width/2;
-    	int 	midY = (height-25)/2;
+    	int 	midY = (height-20)/2;
     	int 	radius = (midX < midY) ? midX-1 : midY-1 ;
     	Bitmap bitmap;
     	
@@ -59,10 +60,12 @@ public final class SimpleClockScreen extends MainScreen
     	g.setBackgroundColor(0x000000);
     	g.clear();
     	
-    	g.setColor(0xFFFFFF);
+//    	g.setColor(0x333945);
+//    	g.fillEllipse(midX, midY, midX+radius, midY, midX, midY+radius, 0, 360);
+    	
+    	g.setColor(Color.WHITE);
     	g.drawEllipse(midX, midY, midX+radius, midY, midX, midY+radius, 0, 360);
-    	g.drawEllipse(midX, midY, midX+4, midY, midX, midY+4, 0, 360);
-
+    	
     	for (int n = 0; n < 60; ++n)
     	{
     		double angle = ((double)n/60.0f)*2.0f*Math.PI;
@@ -88,9 +91,13 @@ public final class SimpleClockScreen extends MainScreen
     		int y3 = (int)(midY - (1-DIGIT_OFFSET)*radius*cAngle);
     		
     		g.drawLine(x1, y1, x2, y2);
-            g.drawText(Integer.toString(n), x3, y3, Graphics.VCENTER | Graphics.HCENTER);
+    		
+    		String hourText = Integer.toString(n);
+    	  	int hourWidth = g.getFont().getBounds(hourText);    	    
+            g.drawText(hourText, x3 - hourWidth/2, y3, Graphics.VCENTER | Graphics.HCENTER);
     	}
 
+    	
     	Calendar cal = Calendar.getInstance();   	    	
     	float hour   = (float)cal.get(Calendar.HOUR);
     	float minute = (float)cal.get(Calendar.MINUTE);
@@ -106,8 +113,8 @@ public final class SimpleClockScreen extends MainScreen
     	g.drawText(dayOfMonthText, domX - domWidth - 5, midY, Graphics.VCENTER | Graphics.HCENTER);
     	
     	int[]   handsValue = new int[] { 
-    			(int)(hour*60 + minute), 
     			(int)(minute*12 + second/60.0f*12), 
+    			(int)(hour*60 + minute), 
     			(int)(second*12 + milsec/1000.f*12) 
     		};
     	    	
@@ -141,10 +148,38 @@ public final class SimpleClockScreen extends MainScreen
     		}
     	}
     	
+    	if (marker > 0)
+    	{
+    		double angle = ((double)marker/720)*2.0f*Math.PI;
+    		double cAngle = Math.cos(angle);
+    		double sAngle = Math.sin(angle);
+    		int x1 = (int)(midX + radius*sAngle);
+    		int y1 = (int)(midY - radius*cAngle);
+    		int x2 = (int)(midX + (1-HOUR_MARKER_LEN)*radius*sAngle);
+    		int y2 = (int)(midY - (1-HOUR_MARKER_LEN)*radius*cAngle);
+    		int dX = (int)(2.0*cAngle);
+    		int dY = (int)(2.0*sAngle);    		
+    		g.setColor(markerColor);
+    		g.drawLine(x2-dX, y2+dY, x1-dX, y1+dY);
+    		g.drawLine(x2+dX, y2-dY, x1+dX, y1-dY);
+    	}
+  
+    	g.setColor(Color.RED);
+    	g.fillEllipse(midX, midY, midX+4, midY, midX, midY+4, 0, 360);
+    	
     	super.paint(graphics);    	
     	graphics.drawBitmap(0, 25, bitmap.getWidth(), bitmap.getHeight()-25, bitmap, 0, 0);
     }
-        
+   
+    public void markTime()
+    {
+    	Calendar cal = Calendar.getInstance();  
+    	float second = (float)cal.get(Calendar.SECOND);
+    	float milsec = (float)cal.get(Calendar.MILLISECOND);    	
+    	marker = (int)(second*12 + milsec/1000.f*12);
+    	refreshScreen();
+    }
+    
     public void refreshScreen()
     {   
     	this.invalidate();

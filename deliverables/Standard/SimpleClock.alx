@@ -4,16 +4,16 @@
 			SimpleClock
 		</name>
 		<description >
-			Clock with Seconds Display and Audio Beep on the Minute
+			Clock with Second Hand and Minute Chime
 		</description>
 		<version >
-			0.02
+			0.10
 		</version>
 		<vendor >
-			TAN Hock Woo
+			Tan Hock Woo
 		</vendor>
 		<copyright >
-			Copyright (c) 2011 TAN Hock Woo
+			Copyright (c) 2011 Tan Hock Woo
 		</copyright>
 		<fileset Java="1.54" _blackberryVersion="[6.0.0)">
 			<directory >

@@ -4,12 +4,16 @@ import java.util.Hashtable;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import net.rim.device.api.i18n.DateFormat;
+import net.rim.device.api.i18n.SimpleDateFormat;
 import net.rim.device.api.system.Alert;
 import net.rim.device.api.system.Application;
+import net.rim.device.api.system.Bitmap;
 import net.rim.device.api.system.PersistentObject;
 import net.rim.device.api.system.PersistentStore;
 import net.rim.device.api.system.RealtimeClockListener;
 import net.rim.device.api.ui.MenuItem;
+import net.rim.device.api.ui.Screen;
 import net.rim.device.api.ui.UiApplication;
 import net.rim.device.api.ui.component.Dialog;
 
@@ -32,50 +36,47 @@ public class SimpleClockApp extends UiApplication implements RealtimeClockListen
 		{
 			app.refreshScreen();
 		}
-	}
+	};
 	
-	private final short[] BEEP = new short[] { 1440, 250, 0, 50 };
+	private final static boolean 	DEBUG_MODE = true;	
+	private final static long 		PERSISTENT_STORE_KEY = 0x8656bdebbc4bfe7L;
+	private final static short[]	CHIME = new short[] { 2500, 250, 0, 50 };
+	private final static String 	CHIME_HASHTABLE_KEY = "IsChimeEnabled";
+	private final static String[]	CHIME_MENU_TEXT = new String[] { "Enable Chime", "Disable Chime" };
+
+	
 	private SimpleClockScreen mainScreen;
 	private Timer refreshTimer;
+	private Boolean isChimeEnabled;
 	
-	private final static long persistentStoreKey = 0x8656bdebbc4bfe7L;
-	private PersistentObject persistentObject = PersistentStore.getPersistentObject(persistentStoreKey);
-	private Hashtable settings;
 	
-	private final String[] minuteMenuText = new String[] { "Turn Beep On", "Turn Beep Off" };
-	
-	private MenuItem toggleMinuteBeepMenuItem = new MenuItem(minuteMenuText[1], 100, 100)
+	private MenuItem markMenuItem = new MenuItem("Mark Time", 1000, 100)
 	{
 		public void run()
 		{
-			Boolean shouldBeep = Boolean.TRUE;
-			if (settings.containsKey("MinuteBeep"))
-			{
-				shouldBeep = (Boolean)settings.get("MinuteBeep");
-			}
-			
-			if (shouldBeep == Boolean.TRUE)
-			{
-				shouldBeep = Boolean.FALSE;
-				setText(minuteMenuText[0]);
-			}
-			else
-			{
-				shouldBeep = Boolean.TRUE;
-				this.setText(minuteMenuText[1]);
-			}
-			
-			settings.put("MinuteBeep", shouldBeep);
-			persistentObject.setContents(settings);
-			persistentObject.commit();
+			DateFormat df = (SimpleDateFormat)(DateFormat.getInstance(DateFormat.TIME_LONG));
+			setText("Marked " + df.formatLocal(System.currentTimeMillis()));
+			mainScreen.markTime();
+		}
+	};
+		
+	private MenuItem toggleMinuteBeepMenuItem = new MenuItem(CHIME_MENU_TEXT[1], 1001, 101)
+	{
+		public void run()
+		{
+			isChimeEnabled = (isChimeEnabled.booleanValue() ? Boolean.FALSE : Boolean.TRUE);
+			setText(CHIME_MENU_TEXT[isChimeEnabled.booleanValue()? 1 : 0]);
+			saveSettings();
 		}
 	};
 	
-	private MenuItem aboutMenuItem = new MenuItem("About ...", 101, 101)
+
+	private MenuItem aboutMenuItem = new MenuItem("About ...", 1011, 102)
 	{
 		public void run()
 		{
-			Dialog.alert("SimpleClock (c) 2011  Tan Hock Woo");
+			Dialog dlg = new Dialog(Dialog.D_OK, "SimpleClock \u00a9 2011\n  Tan Hock Woo", 0, Bitmap.getBitmapResource("icon.png"), Screen.NO_SYSTEM_MENU_ITEMS);
+			dlg.doModal();
 		}
 	};
 	
@@ -96,45 +97,56 @@ public class SimpleClockApp extends UiApplication implements RealtimeClockListen
      */
     public SimpleClockApp()
     {        
+    	// Load settings and setup menus
+    	loadSettings();
+    	toggleMinuteBeepMenuItem.setText(CHIME_MENU_TEXT[isChimeEnabled.booleanValue() ? 1 : 0]);    	
     	
-    	settings = (Hashtable)persistentObject.getContents();
-    	if (settings == null)
-    	{
-    		settings = new Hashtable();
-    		settings.put("MinuteBeep", new Boolean(true));
-    		persistentObject.setContents(settings);
-    		persistentObject.commit();
-    	};
-    	
-		Boolean shouldBeep = Boolean.TRUE;
-		if (settings.containsKey("MinuteBeep"))
-		{
-			shouldBeep = (Boolean)settings.get("MinuteBeep");
-		}
-		toggleMinuteBeepMenuItem.setText(minuteMenuText[shouldBeep == Boolean.TRUE ? 1 : 0]);
-    	
-        // Push a screen onto the UI stack for rendering.
+    	// Push a screen onto the UI stack for rendering.
     	mainScreen = new SimpleClockScreen();
+    	mainScreen.addMenuItem(markMenuItem);
     	mainScreen.addMenuItem(toggleMinuteBeepMenuItem);
+    	mainScreen.addMenuItem(MenuItem.separator(1010));
     	mainScreen.addMenuItem(aboutMenuItem);
-        pushScreen(mainScreen);
+    	pushScreen(mainScreen);
         
         refreshTimer = new Timer();
         refreshTimer.scheduleAtFixedRate(new TimeSignalTask(this), 200, 200);
         addRealtimeClockListener(this);
     }
+    private void loadSettings()
+    {
+    	isChimeEnabled = Boolean.TRUE;
+    	if (!DEBUG_MODE)
+    	{
+	    	PersistentObject persistentObject = PersistentStore.getPersistentObject(PERSISTENT_STORE_KEY);
+	    	Hashtable settings = (Hashtable)persistentObject.getContents();
+	    	if (settings == null) return;
+	    	{
+	    		settings = new Hashtable();
+	    		settings.put(CHIME_HASHTABLE_KEY, isChimeEnabled);
+	    	};
+    	}
+    }
     
-	public void clockUpdated() {
+    private void saveSettings()
+    {
+       	if (!DEBUG_MODE)
+    	{  	
+	    	PersistentObject persistentObject = PersistentStore.getPersistentObject(PERSISTENT_STORE_KEY);
+	    	Hashtable settings = (Hashtable)persistentObject.getContents();
+	
+	    	settings.put(CHIME_HASHTABLE_KEY, isChimeEnabled);
+	    	persistentObject.setContents(settings);
+	    	persistentObject.commit();    	
+    	}
+    }
+    
+	public void clockUpdated() 
+    {
 		if (!Application.getApplication().isForeground()) return;
-		Boolean shouldBeep = Boolean.TRUE;
-		if (settings.containsKey("MinuteBeep"))
+		if (!DEBUG_MODE && isChimeEnabled.booleanValue())
 		{
-			shouldBeep = (Boolean)settings.get("MinuteBeep");
-		}
-		
-		if (shouldBeep == Boolean.TRUE)
-		{
-			Alert.startAudio(BEEP, 100);
+			Alert.startAudio(CHIME, Alert.getVolume());
 		}
 	}    
 	
